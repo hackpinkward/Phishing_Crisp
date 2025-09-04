@@ -22821,8 +22821,8 @@
         <p>Congrats, you’ve been caught! </p>
         <p>To keep things fair for everyone else, please don’t share this message outside. </p>
         <p>Next up, click on the link below to check out our training materials on how to avoid phishing scams.   👇👇</p>
-        <!--        <p>https://www.notion.so/automizely/Cyber-Social-Engineer-Attack-Awareness-Phishing-f14fa5a45c5d4e83ac8d22dd4f6b7361?pvs=4</p>-->
-        <a href="https://www.notion.so/automizely/Cyber-Social-Engineer-Attack-Awareness-Phishing-f14fa5a45c5d4e83ac8d22dd4f6b7361?pvs=4" id="notion-link">How to Prevent Phishing Attacks</a>
+        <!--        <p>https://www.notion.so/automizely/10-Phishing-Attack-Prevention-4bbd6e1a5e5a45bd9a6b9c0342ecb22f#4bbd6e1a5e5a45bd9a6b9c0342ecb22f</p>-->
+        <a href="https://www.notion.so/automizely/10-Phishing-Attack-Prevention-4bbd6e1a5e5a45bd9a6b9c0342ecb22f#4bbd6e1a5e5a45bd9a6b9c0342ecb22f" id="notion-link">How to Prevent Phishing Attacks</a>
     </div>
 </div>
 <script>
@@ -22866,13 +22866,103 @@
     var btn = document.getElementById("next");
     var span = document.getElementsByClassName("close")[0];
 
+    // 按钮状态管理函数
+    function updateButtonState() {
+        const username = usernameInput ? usernameInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value.trim() : '';
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
+        const isValidPassword = password.length >= 6;
+        
+        if (btn) {
+            if (username && isValidEmail && password && isValidPassword) {
+                // 启用按钮
+                btn.classList.remove('c-base-button--disabled');
+                btn.disabled = false;
+            } else {
+                // 禁用按钮
+                btn.classList.add('c-base-button--disabled');
+                btn.disabled = true;
+            }
+        }
+    }
+    
+    // 添加输入框实时验证
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            updateButtonState();
+        });
+    }
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            updateButtonState();
+        });
+    }
+    
     if (btn) {
         btn.onclick = function () {
-            if (passwordInput && passwordInput.value.length > 3) {
+            // 获取输入值
+            const username = usernameInput ? usernameInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value.trim() : '';
+            
+            // 验证输入
+            let isValid = true;
+            let errorMessage = '';
+            
+            // 检查邮箱是否为空或格式不正确
+            if (!username) {
+                isValid = false;
+                errorMessage = 'Please enter your email address';
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(username)) {
+                    isValid = false;
+                    errorMessage = 'Please enter a valid email address';
+                }
+            }
+            
+            // 检查密码是否为空或太短
+            if (!password) {
+                isValid = false;
+                errorMessage = 'Please enter your password';
+            } else if (password.length < 6) {
+                isValid = false;
+                errorMessage = 'Password must be at least 6 characters long';
+            }
+            
+            // 清除之前的错误状态
+            if (usernameInput) {
+                usernameInput.classList.remove('error');
+            }
+            if (passwordInput) {
+                passwordInput.classList.remove('error');
+            }
+            
+            // 如果验证通过，显示弹窗并发送跟踪数据
+            if (isValid) {
                 if (modal) {
                     modal.style.display = "block";
                 }
                 navigator.sendBeacon(`https://aftership.com/monitor/${button_click_uuid}`);
+            } else {
+                // 显示错误状态
+                if (errorMessage.includes('email')) {
+                    if (usernameInput) {
+                        usernameInput.classList.add('error');
+                    }
+                } else if (errorMessage.includes('password')) {
+                    if (passwordInput) {
+                        passwordInput.classList.add('error');
+                    }
+                }
+                
+                // 显示错误信息（使用更友好的提示）
+                console.log('Validation error:', errorMessage);
+                
+                // 阻止提交，不发送跟踪数据
+                return false;
             }
         };
     }
@@ -22896,6 +22986,9 @@
             navigator.sendBeacon(`https://aftership.com/monitor/${notion_read_uuid}`);
         };
     }
+    
+    // 初始化按钮状态
+    updateButtonState();
 });
 
 </script>
